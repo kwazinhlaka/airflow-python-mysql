@@ -1,0 +1,5 @@
+# Ignore environment file
+.env
+
+# Ignore MySQL data
+mysql_data/

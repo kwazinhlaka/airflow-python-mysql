@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  airflow-webserver:
+    image: apache/airflow:2.5.0
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+    command: webserver
+
+  airflow-scheduler:
+    image: apache/airflow:2.5.0
+    volumes:
+      - ./dags:/opt/airflow/dags
+    depends_on:
+      - airflow-webserver
+    command: scheduler
+
+  airflow-init:
+    image: apache/airflow:2.5.0
+    volumes:
+      - ./dags:/opt/airflow/dags
+    entrypoint: airflow db init
+
+  mysql_db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
